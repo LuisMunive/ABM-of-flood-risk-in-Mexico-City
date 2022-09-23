@@ -30,7 +30,7 @@ globals [
   patches-with-elevation
 ]
 
-; Procedure to read external files (Mexico City elevation continuum (ASCII format) and atlas flood risk (shapefile))
+; Procedure to read external files (Mexico City elevation continuum (ASCII format) and atlas flood risk (shapefile format))
 to read-files
   set elevation-dataset gis:load-dataset "elevation-cdmx.asc"
   set risk-dataset gis:load-dataset "atlas_de_riesgo_inundaciones.shp"
@@ -103,6 +103,11 @@ to go
     ; don't get pooling at the edges
     ask turtles-here [die]
   ]
+    ask turtles
+  [
+    set shape "circle"
+    set size 1
+  ]
   tick
 end
 
@@ -110,11 +115,14 @@ to flow ; Turtle procedue
   ; Get the lowest neighboring patch taking into account
   ; how much water is on each patch.
   let target min-one-of neighbors with [(elevation <= 0) or (elevation >= 0)] [elevation + (count turtles-here * water-height)]
+  if target != nobody
+  [
   ; If the elevation + water on the neighboring patch is
   ; lower than here move to that patch.
-  ifelse[elevation + (count turtles-here * water-height)] of target < (elevation + (count turtles-here * water-height))
-  [move-to target]
-  [set breed waters]
+    ifelse [elevation + (count turtles-here * water-height)] of target < (elevation + (count turtles-here * water-height))
+    [move-to target]
+    [set breed waters]
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -185,7 +193,7 @@ SLIDER
 191
 rain-rate
 rain-rate
-0
+1
 10
 10.0
 1
@@ -200,7 +208,7 @@ SLIDER
 140
 water-height
 water-height
-0
+1
 10
 10.0
 1
@@ -264,81 +272,36 @@ NIL
 @#$#@#$#@
 ## WHAT IS IT?
 
-This model simulates rainfall on a patch of terrain on the eastern end of the Grand Canyon, approximately 6 miles (9.7 km) on each side, where Crazy Jug Canyon and Saddle Canyon meet to form Tapeats Canyon. Each patch represents an area approximately 105 feet (32 m) on each side. The model was created as an experiment in using NetLogo with My World GIS.
-
-The elevation data comes from the National Elevation Dataset available at https://www.nrcs.usda.gov/wps/portal/nrcs/detail/national/?&cid=nrcs143_021626. It was converted from an ESRI Grid into an ASCII grid file using ArcGIS, then resampled to its current resolution and rescaled to lie in the range 0-999 using My World GIS.
 
 ## HOW IT WORKS
 
-Raindrops fall in random locations or at locations selected by the user, then flow downhill.  If no nearby patch has a lower elevation, the raindrop stays where it is.  Raindrops pool until they flow over the land nearby. Some raindrops may always stay in these pools at higher ground. Others will flow out of the system at the edges.
 
 ## HOW TO USE IT
 
-When you open the model, the STARTUP procedure automatically runs and imports the data from an external file.  Press SETUP to color the patches according to their elevation, and to remove raindrops and drawings from previous runs. Press the GO button to start the simulation.  With each tick, RAIN-RATE raindrops will fall at random locations, traveling downhill across the landscape.
-
-As the simulation runs, you may click anywhere on the map to create raindrops. Manually placed raindrops are red, while those created randomly by the model are blue.  The WATCH RANDOM RAINDROP button sets the perspective to watch a randomly selected raindrop (of any type). The WATCH MY RAINDROP button watches a red raindrop, if one exists.
-
-When the DRAW? switch is turned on each raindrop marks its path in the drawing layer.
 
 ## THINGS TO NOTICE
 
-Elevations are represented by lighter and darker colors. The higher the elevation, the lighter the color used to draw that patch. Raindrops flow from high to low elevations, meaning that they flow toward darker patches.
-
-When you let the model run for a long time, you will see pools start to form at certain locations where a bit of low land is surrounded by higher land.  If you let the model run long enough, the water will eventually overflow from these dips, flowing to the rivers below.
 
 ## THINGS TO TRY
 
-Put the turtle pens down (by turning on the DRAW? switch), and see the kinds of patterns that emerge.
-
-Try to place all of the raindrops manually.  Trace the path of one drop all the way down the landscape.
-
-Find more GIS data and import different data sets.
 
 ## EXTENDING THE MODEL
 
-Add erosion to the model, so the raindrops pick up or deposit some amount of elevation from the patches they travel over.
 
 ## NETLOGO FEATURES
 
-When there is no lower neighboring patch, raindrops change breed (from raindrop to waters) so they will no longer move.
-
-Elevation data is read only once, when the model is loaded, in the `startup` procedure.  The external data file (Grand Canyon data.txt) is formatted such that its contents can be assigned (with `file-read`) to a NetLogo variable.
 
 ## RELATED MODELS
 
-Erosion
 
 ## CREDITS AND REFERENCES
 
-National Elevation Dataset: https://catalog.data.gov/dataset/usgs-national-elevation-dataset-ned
-ArcGIS: https://www.esri.com/en-us/arcgis/about-arcgis/overview
-My World GIS (archival): https://serc.carleton.edu/resources/19436.html
-
-Thanks to Eric Russell for his work on this model.
 
 ## HOW TO CITE
 
-If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
-
-For the model itself:
-
-* Wilensky, U. (2006).  NetLogo Grand Canyon model.  http://ccl.northwestern.edu/netlogo/models/GrandCanyon.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
-
-Please cite the NetLogo software as:
-
-* Wilensky, U. (1999). NetLogo. http://ccl.northwestern.edu/netlogo/. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
 ## COPYRIGHT AND LICENSE
 
-Copyright 2006 Uri Wilensky.
-
-![CC BY-NC-SA 3.0](http://ccl.northwestern.edu/images/creativecommons/byncsa.png)
-
-This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License.  To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/3.0/ or send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
-
-Commercial licenses are also available. To inquire about commercial licenses, please contact Uri Wilensky at uri@northwestern.edu.
-
-<!-- 2006 -->
 @#$#@#$#@
 default
 true
